@@ -1,3 +1,4 @@
 # narcolepsy.github.io
 
-[https://narcolepsy.github.io|link]
+[link to page](https://narcolepsy.github.io "grumble")
+
