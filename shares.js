@@ -22,7 +22,7 @@ window.onload = function() {
    console.log(allshares);
 }
 var add_to_shares = function(share_list) {
-   allshares.push(share_list);
+   allshares = allshares.concat(share_list);
    console.log("Adding shares");
    console.log(allshares);
 }
@@ -56,6 +56,7 @@ function add_currency_to_array(index, callback) {
          mydata = create_data(myObj);
 
          draw_graph(mydata);
+         console.log(mydata);
          callback.apply(req,[mydata]);
       }
    }
