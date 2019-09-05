@@ -1,4 +1,7 @@
 var allshares = [];
+var completed = 0;
+eval("apikey = \"" + getQueryVariable("apikey")+ "\"");
+console.log(apikey);
 window.onload = function() {
    //sqlite3 -header -column shares.db 'select Price,Rate,Crus_GBP from Shares;'
    //d3.selectAll("p").style("color", "blue");
@@ -8,6 +11,7 @@ window.onload = function() {
    url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=CRUS&interval=5min&apikey="+apikey;
    url2 = "https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=USD&to_symbol=GBP&interval=5min&apikey="+apikey;
 
+   console.log(url);
    //var xmlhttp = new XMLHttpRequest();
    //xmlhttp.onreadystatechange = create_graph;
    //xmlhttp.open("GET", url, true);
@@ -16,20 +20,28 @@ window.onload = function() {
    //xmlhttp2.onreadystatechange = create_graph;
    //xmlhttp2.open("GET", url2, true);
    //xmlhttp2.send();
+   //
+   //
    add_shares_to_array("CRUS",add_to_shares);
    add_shares_to_array("AAPL",add_to_shares);
    add_currency_to_array("USD-GBP",add_to_shares); //TODO do something with this argument
    console.log(allshares);
 }
-var add_to_shares = function(share_list) {
+var add_to_shares = function(share_list,completed_queries,passed) {
    allshares = allshares.concat(share_list);
-   console.log("Adding shares");
+   completed = completed + completed_queries;
+   console.log("Adding shares: completed="+completed+"passed="+passed);
    console.log(allshares);
+   if (completed == 3) { //TODO make this dynamic
+      draw_graph(allshares);
+   }
 }
 function add_shares_to_array(index, callback) {
    url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="+index+"&interval=5min&apikey="+apikey;
    var req = new XMLHttpRequest();
    //req.onreadystatechange = create_graph(add_to_shares);
+   var passed = 0;
+   var completed = 0;
    req.onreadystatechange = function() {
       if (req.readyState == 4 && req.status == 200) {
          var myObj = JSON.parse(req.responseText);
@@ -38,7 +50,9 @@ function add_shares_to_array(index, callback) {
          mydata = create_data(myObj);
 
          draw_graph(mydata);
-         callback.apply(req,[mydata]);
+         passed = 1;
+         completed = 1;
+         callback.apply(req,[mydata,completed,passed]);
       }
    }
    req.open("GET", url, true);
@@ -47,6 +61,8 @@ function add_shares_to_array(index, callback) {
 function add_currency_to_array(index, callback) {
    url = "https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=USD&to_symbol=GBP&interval=5min&apikey="+apikey;
    var req = new XMLHttpRequest();
+   var completed = 0;
+   var passed = 0;
    //req.onreadystatechange = create_graph(add_to_shares);
    req.onreadystatechange = function() {
       if (req.readyState == 4 && req.status == 200) {
@@ -57,7 +73,9 @@ function add_currency_to_array(index, callback) {
 
          draw_graph(mydata);
          console.log(mydata);
-         callback.apply(req,[mydata]);
+         completed = 1;
+         passed = 1;
+         callback.apply(req,[mydata,completed,passed]);
       }
    }
    req.open("GET", url, true);
@@ -74,13 +92,22 @@ function create_graph(callback) {
 
       draw_graph(mydata);
       callback.apply(req,[console_log_data]);
-
    }
    else {
       console.log(this);
    }
 }
 
+function getQueryVariable(variable)
+{
+   var query = window.location.search.substring(1);
+   var vars = query.split("&");
+   for (var i=0;i<vars.length;i++) {
+      var pair = vars[i].split("=");
+      if(pair[0] == variable){return pair[1];}
+   }
+   return(false);
+}
 function create_data(json_input) {
    //create empty hash to fill up
    var data_array = [];
@@ -148,7 +175,7 @@ function draw_graph(mydata) {
    y.domain(d3.extent(mydata, function(d) {return d.price}));
    // Nest the entries by symbol
    var dataNest = d3.nest()
-      .key(function(d) {return "CRUS";})
+      .key(function(d) {return d.key;})
       .entries(mydata);
    // Loop through each symbol / key
    dataNest.forEach(function(d) {
