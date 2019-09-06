@@ -119,13 +119,13 @@ function create_data(json_input) {
          type = json_input[key]
          if (type["1. Information"] === "Intraday (5min) open, high, low, close prices and volume") {
             myquery = type["2. Symbol"];
+            mytimezone = "-0500";
          }
          else if (type["1. Information"] === "FX Intraday (5min) Time Series") {
             myquery = type["2. From Symbol"] + type["3. To Symbol"];
+            mytimezone = "+0100";
          }
          console.log(myquery);
-
-      }
       else {
          var obj = json_input[key]
          //Now we have the time series we need to iterate through all the keys in here
@@ -134,13 +134,13 @@ function create_data(json_input) {
             //skip if property is from prototype
             if (!obj.hasOwnProperty(timestamp)) continue;
             data_hash["key"]     = myquery;
-            data_hash["time"]    = timestamp;
+            data_hash["time"]    = timestamp+mytimezone;
             data_hash["price"]   = obj[timestamp]["4. close"];
             data_array.push(data_hash)
          }
       }
    }
-   var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+   var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S%Z");
    data_array.forEach(function(d) {
       d.time = parseDate(d.time);
       d.price = +d.price;
