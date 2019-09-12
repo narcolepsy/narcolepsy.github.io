@@ -1,5 +1,7 @@
 var allshares = [];
-var completed = 0;
+var allcurrency = [];
+var shares_completed = 0;
+var currency_completed = 0;
 eval("apikey = \"" + getQueryVariable("apikey")+ "\"");
 console.log(apikey);
 window.onload = function() {
@@ -24,16 +26,27 @@ window.onload = function() {
    //
    add_shares_to_array("CRUS",add_to_shares);
    add_shares_to_array("AAPL",add_to_shares);
-   add_currency_to_array("USD-GBP",add_to_shares); //TODO do something with this argument
+   add_currency_to_array("USD-GBP",add_to_currency); //TODO do something with this argument
    console.log(allshares);
 }
 var add_to_shares = function(share_list,completed_queries,passed) {
    allshares = allshares.concat(share_list);
-   completed = completed + completed_queries;
-   console.log("Adding shares: completed="+completed+"passed="+passed);
+   shares_completed = shares_completed + completed_queries;
+   console.log("Adding shares: completed="+shares_completed+"passed="+passed);
    console.log(allshares);
-   if (completed == 3) { //TODO make this dynamic
-      draw_graph(allshares);
+   check_if_done();
+}
+var add_to_currency = function(share_list,completed_queries,passed) {
+   allcurrency = allcurrency.concat(share_list);
+   currency_completed = currency_completed + completed_queries;
+   console.log("Adding currency: completed="+currency_completed+"passed="+passed);
+   console.log(allcurrency);
+   check_if_done();
+}
+function check_if_done() {
+   if (shares_completed == 2 && currency_completed == 1) {
+      //TODO parameterise the above two constants
+      console.log("Entering complete state - about to merge data and plot");
    }
 }
 function add_shares_to_array(index, callback) {
