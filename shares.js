@@ -119,13 +119,14 @@ function create_data(json_input) {
          type = json_input[key]
          if (type["1. Information"] === "Intraday (5min) open, high, low, close prices and volume") {
             myquery = type["2. Symbol"];
-            mytimezone = "-0500";
+            mytimezone = "-0400";
          }
          else if (type["1. Information"] === "FX Intraday (5min) Time Series") {
             myquery = type["2. From Symbol"] + type["3. To Symbol"];
-            mytimezone = "+0100";
+            mytimezone = "+0000";
          }
          console.log(myquery);
+      }
       else {
          var obj = json_input[key]
          //Now we have the time series we need to iterate through all the keys in here
