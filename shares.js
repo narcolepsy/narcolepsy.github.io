@@ -14,16 +14,6 @@ window.onload = function() {
    url2 = "https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=USD&to_symbol=GBP&interval=5min&apikey="+apikey;
 
    console.log(url);
-   //var xmlhttp = new XMLHttpRequest();
-   //xmlhttp.onreadystatechange = create_graph;
-   //xmlhttp.open("GET", url, true);
-   //xmlhttp.send();
-   //var xmlhttp2 = new XMLHttpRequest();
-   //xmlhttp2.onreadystatechange = create_graph;
-   //xmlhttp2.open("GET", url2, true);
-   //xmlhttp2.send();
-   //
-   //
    add_shares_to_array("CRUS",add_to_shares);
    add_shares_to_array("AAPL",add_to_shares);
    add_currency_to_array("USD-GBP",add_to_currency); //TODO do something with this argument
@@ -52,7 +42,6 @@ function check_if_done() {
 function add_shares_to_array(index, callback) {
    url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="+index+"&interval=5min&apikey="+apikey;
    var req = new XMLHttpRequest();
-   //req.onreadystatechange = create_graph(add_to_shares);
    var passed = 0;
    var completed = 0;
    req.onreadystatechange = function() {
@@ -76,7 +65,6 @@ function add_currency_to_array(index, callback) {
    var req = new XMLHttpRequest();
    var completed = 0;
    var passed = 0;
-   //req.onreadystatechange = create_graph(add_to_shares);
    req.onreadystatechange = function() {
       if (req.readyState == 4 && req.status == 200) {
          var myObj = JSON.parse(req.responseText);
@@ -93,22 +81,6 @@ function add_currency_to_array(index, callback) {
    }
    req.open("GET", url, true);
    req.send();
-}
-function create_graph(callback) {
-   //TODO changed all this to req
-   console.log(callback);
-   if (req.readyState == 4 && req.status == 200) {
-      var myObj = JSON.parse(req.responseText);
-      //document.getElementById("demo").innerHTML = myObj.name;
-      console.log(myObj);
-      mydata = create_data(myObj);
-
-      draw_graph(mydata);
-      callback.apply(req,[console_log_data]);
-   }
-   else {
-      console.log(this);
-   }
 }
 
 function getQueryVariable(variable)
