@@ -37,10 +37,11 @@ function check_if_done() {
    if (shares_completed == 2 && currency_completed == 1) {
       //TODO parameterise the above two constants
       console.log("Entering complete state - about to merge data and plot");
+      console.log(allshares);
    }
 }
 function add_shares_to_array(index, callback) {
-   url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="+index+"&interval=5min&apikey="+apikey;
+   url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol="+index+"&apikey="+apikey;
    var req = new XMLHttpRequest();
    var passed = 0;
    var completed = 0;
@@ -61,7 +62,7 @@ function add_shares_to_array(index, callback) {
    req.send();
 }
 function add_currency_to_array(index, callback) {
-   url = "https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=USD&to_symbol=GBP&interval=5min&apikey="+apikey;
+   url = "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=GBP&apikey="+apikey;
    var req = new XMLHttpRequest();
    var completed = 0;
    var passed = 0;
@@ -102,11 +103,11 @@ function create_data(json_input) {
       //Skip the metadata
       if (key === "Meta Data") {
          type = json_input[key]
-         if (type["1. Information"] === "Intraday (5min) open, high, low, close prices and volume") {
+         if (type["1. Information"] === "Daily Prices (open, high, low, close) and Volumes") {
             myquery = type["2. Symbol"];
             mytimezone = "-0400";
          }
-         else if (type["1. Information"] === "FX Intraday (5min) Time Series") {
+         else if (type["1. Information"] === "Forex Daily Prices (open, high, low, close)") {
             myquery = type["2. From Symbol"] + type["3. To Symbol"];
             mytimezone = "+0000";
          }
@@ -120,13 +121,15 @@ function create_data(json_input) {
             //skip if property is from prototype
             if (!obj.hasOwnProperty(timestamp)) continue;
             data_hash["key"]     = myquery;
-            data_hash["time"]    = timestamp+mytimezone;
+            //data_hash["time"]    = timestamp+mytimezone;
+            data_hash["time"]    = timestamp;
             data_hash["price"]   = obj[timestamp]["4. close"];
             data_array.push(data_hash)
          }
       }
    }
-   var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S%Z");
+   //var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S%Z");
+   var parseDate = d3.timeParse("%Y-%m-%d");
    data_array.forEach(function(d) {
       d.time = parseDate(d.time);
       d.price = +d.price;
