@@ -42,11 +42,14 @@ function check_if_done() {
 }
 function add_shares_to_array(index, callback) {
    url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol="+index+"&apikey="+apikey;
+   url = "https://trafficscotland.org/components/livetrafficcameras/ajax/levcameraview.aspx?cam=299&sessionStartTime=1612457221";
    var req = new XMLHttpRequest();
    var passed = 0;
    var completed = 0;
+   req.responseType = "blob"; //TODO investigating blobs
    req.onreadystatechange = function() {
       if (req.readyState == 4 && req.status == 200) {
+         console.log(req)
          var myObj = JSON.parse(req.responseText);
          //document.getElementById("demo").innerHTML = myObj.name;
          console.log(myObj);
